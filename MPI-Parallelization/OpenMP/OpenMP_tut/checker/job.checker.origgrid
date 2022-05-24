@@ -1,0 +1,10 @@
+NO parallelization
+-----------------------
+ 
+Sum:       89087.42
+Total time:        4.385254
+WITH parallelization
+-----------------------
+ 
+Sum:       89087.42
+Total time:        0.232808

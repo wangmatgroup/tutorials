@@ -1,0 +1,7 @@
+#!/bin/bash
+#PBS -l nodes=2:ppn=12
+#PBS -l walltime=2:00:00
+#PBS -V
+cd $PBS_O_WORKDIR
+export LD_LIBRARY_PATH=/opt/openmpi/lib:$LD_LIBRARY_PATH
+/opt/openmpi/bin/mpirun -np 24 ./hello.x > hello.out

@@ -1,0 +1,19 @@
+
+CXX             = icpc
+CXXFLAGS        = -qopenmp -Wall
+
+
+CPP_SOURCES     = $(wildcard *.cpp)
+CPP_TARGETS     = $(CPP_SOURCES:.cpp=.x)
+
+.PHONY: all     clean
+
+all:    $(CPP_TARGETS)
+
+clean: 
+	rm -f $(CPP_TARGETS)
+
+.SUFFIXES: .x 
+
+%.x: %.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $^

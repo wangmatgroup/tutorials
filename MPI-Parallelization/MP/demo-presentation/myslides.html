@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Jimmy-Xuan Shen">
+  <title>Using MPI on CNSI Clusters</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="reveal.js/css/reveal.css">
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="reveal.js/css/theme/black.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal.js/css/print/pdf.css' : 'reveal.js/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+  <h1 class="title">Using MPI on CNSI Clusters</h1>
+  <h2 class="author">Jimmy-Xuan Shen</h2>
+  <h3 class="date">Sep 06, 2017</h3>
+</section>
+
+<section id="message-passing-interface-mpi" class="slide level1">
+<h1>Message Passing Interface (MPI)</h1>
+<h2 id="main-purpose">Main purpose:</h2>
+<p>communicating between processes</p>
+<h2 id="types-of-communication">Types of communication:</h2>
+<ul>
+<li>synchronization</li>
+<li>movement of data <img src="https://computing.llnl.gov/tutorials/mpi/images/hybrid_mem.gif"></li>
+</ul>
+</section>
+<section class="slide level1">
+
+<h2 id="general-philosophy">General philosophy</h2>
+<ul>
+<li><p>Distribute or send/receive data between processes</p></li>
+<li><p>Like a email server for CPUs</p></li>
+</ul>
+</section>
+<section id="example-sorting" class="slide level1">
+<h1>Example: sorting</h1>
+<div class="right">
+<p><img src="http://img.sparknotes.com/figures/B/becc4efefde067dce51a326cca23c5f0/mergesort.gif"></p>
+</div>
+<ul>
+<li><p>Full list is <span class="math inline"><em>O</em>(<em>N</em>log<em>N</em>)</span></p></li>
+<li><p>Partial lists are <span class="math inline">$O(\frac{N}{2} \log \frac{N}{2})$</span></p></li>
+<li><p>Final sorting is <span class="math inline"><em>O</em>(<em>N</em>)</span></p></li>
+</ul>
+</section>
+<section id="considerations-while-using-mpi" class="slide level1">
+<h1>Considerations while using MPI</h1>
+<h2 id="all-parallelism-is-explicity.">All parallelism is explicity.</h2>
+<h2 id="the-user-must-correctly-identify-and-implement-the-parallelization.">The user must correctly identify and implement the parallelization.</h2>
+<p>The MPI construct only provides a few algorithms for passing data. Each MPI process holds onto a single number <em>myid</em>. Parallalization is implemented around these different numbers.</p>
+</section>
+<section id="approach-to-the-tutorial" class="slide level1">
+<h1>Approach to the tutorial</h1>
+<h2 id="most-basic-usage-senario">Most basic usage senario</h2>
+<ol type="1">
+<li>Read some input files on one process and distribute the data<br />
+</li>
+<li>Compute <span class="math inline"><em>π</em></span> by calculating <span class="math inline">$y = \sqrt{1-x^2}$</span> on many different points<br />
+</li>
+<li>Collect the result from each MPI process to obtain <span class="math inline">$\int_{-1}^{1}\,\sqrt{1-x^2}\,dx=\pi/2$</span></li>
+</ol>
+<div class="right" markdown="1">
+<p><img src="http://cercs-ed.gatech.edu/sites/default/files/u24/integrating_circle.jpg" style="width:400px"></p>
+</div>
+<ol type="1">
+<li>First ordered list item</li>
+<li>Another item</li>
+</ol>
+<ul>
+<li>Unordered sub-list.</li>
+</ul>
+<ol type="1">
+<li>Actual numbers don't matter, just that it's a number</li>
+<li>Ordered sub-list</li>
+<li>And another item.</li>
+</ol>
+<p>You can have properly indented paragraphs within list items. Notice the blank line above, and the leading spaces (at least one, but we'll use three here to also align the raw Markdown).</p>
+<p>⋅⋅⋅To have a line break without a paragraph, you will need to use two trailing spaces.⋅⋅ ⋅⋅⋅Note that this line is separate, but within the same paragraph.⋅⋅ ⋅⋅⋅(This is contrary to the typical GFM line break behaviour, where trailing spaces are not required.)</p>
+<ul>
+<li>Unordered list can use asterisks</li>
+<li>Or minuses</li>
+<li>Or pluses</li>
+</ul>
+</section>
+<section id="hello-world" class="slide level1">
+<h1>Hello world</h1>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="pp">#include </span><span class="im">&quot;mpi.h&quot;</span>
+<span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span>
+<span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">char</span> *argv[]) {
+    <span class="dt">int</span> numprocs, myid;
+    MPI_Init(&amp;argc,&amp;argv);
+    MPI_Comm_size(MPI_COMM_WORLD,&amp;numprocs);
+    MPI_Comm_rank(MPI_COMM_WORLD,&amp;myid);
+    printf (<span class="st">&quot;Number of tasks= %d My rank= %d</span><span class="sc">\n</span><span class="st">&quot;</span>, numprocs, myid);
+    MPI_Finalize();
+    <span class="cf">return</span> <span class="dv">0</span>;
+}</code></pre></div>
+</section>
+<section id="run-the-code-on-a-knot" class="slide level1">
+<h1>Run the code on a KNOT</h1>
+<h3 id="we-will-compile-the-code-with-mpicc-and-run-the-code-with-mpirun">We will compile the code with mpicc and run the code with mpirun</h3>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="op">&gt;&gt;&gt;</span> <span class="fu">which</span> mpirun
+<span class="ex">/opt/intel/compilers_and_libraries_2016.1.150/linux/mpi/intel64/bin/mpirun</span></code></pre></div>
+<h3 id="intels-version-of-mpirun-is-loaded-by-default">Intel's version of mpirun is loaded by default</h3>
+<h3 id="but-openmpi-is-much-easier-to-link">But OPENMPI is much easier to link</h3>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="bu">export</span> <span class="va">PATH=</span>/opt/openmpi/bin:<span class="va">$PATH</span></code></pre></div>
+<p>The libarary path must also be availible <strong>even during run time</strong></p>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="bu">export</span> <span class="va">LD_LIBRARY_PATH=</span>/opt/openmpi/lib:<span class="va">$LD_LIBRARY_PATH</span></code></pre></div>
+</section>
+<section id="dependencies" class="slide level1">
+<h1>Dependencies</h1>
+<h3 id="mpicc-from-openmpi-has-some-very-nice-features-that-the-intel-version-does-not.">mpicc from OpenMPI has some very nice features that the INTEL version does not.</h3>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="co"># Show the flags necessary to compile MPI C applications</span>
+<span class="ex">shell</span>$ mpicc --showme:compile
+ 
+<span class="co"># Show the flags necessary to link MPI C applications</span>
+<span class="ex">shell</span>$ mpicc --showme:link</code></pre></div>
+<h2 id="makefile">Makefile</h2>
+<pre><code>[jshen@knot hello]$ cat Makefile 
+CC=/opt/openmpi/bin/mpicc
+MPI_COMPILE_FLAGS = $(shell $(CC) --showme:compile)
+MPI_LINK_FLAGS = $(shell $(CC) --showme:link)
+
+hello: hello.c
+    $(CC) $(MPI_COMPILE_FLAGS) hello.c \
+    $(MPI_LINK_FLAGS) -o hello.x
+    
+[jshen@knot hello]$ make 
+/opt/openmpi/bin/mpicc -I/opt/openmpi-1.6.4/include \
+-pthread hello.c -pthread -L/opt/openmpi-1.6.4/lib -lmpi \
+-ldl -lm -Wl,--export-dynamic -lrt -lnsl -lutil -o hello.x</code></pre>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c">MPI_Comm_size(MPI_COMM_WORLD,&amp;numprocs);
+MPI_Comm_rank(MPI_COMM_WORLD,&amp;myid);
+<span class="cf">if</span> (myid == <span class="dv">0</span>) {
+    printf(<span class="st">&quot;WORKING on NODE %d</span><span class="sc">\n</span><span class="st">&quot;</span>, myid);
+    FILE *ifp;
+    <span class="dt">char</span> param[<span class="dv">20</span>];
+    <span class="dt">int</span> val;
+    ifp = fopen(<span class="st">&quot;cal_pi.inp&quot;</span>, <span class="st">&quot;r&quot;</span>);
+    <span class="cf">while</span> (fscanf(ifp, <span class="st">&quot;%s %d&quot;</span>, param, &amp;val) != EOF) {
+         printf(<span class="st">&quot;%stt</span><span class="sc">\n</span><span class="st">&quot;</span>, &amp;param);
+        <span class="cf">if</span> ( strcmp(param,<span class="st">&quot;div_min&quot;</span>) == <span class="dv">0</span>) {
+            printf(<span class="st">&quot;div_min %d</span><span class="sc">\n</span><span class="st">&quot;</span>, val);
+            div_min=val;
+        }
+        <span class="cf">if</span> ( strcmp(param,<span class="st">&quot;div_max&quot;</span>) == <span class="dv">0</span>) {
+            printf(<span class="st">&quot;div_min %d</span><span class="sc">\n</span><span class="st">&quot;</span>, val);
+            div_max=val;
+        }
+    }
+}
+MPI_Bcast(&amp;div_min, <span class="dv">1</span>, MPI_INT, <span class="dv">0</span>, MPI_COMM_WORLD);
+MPI_Bcast(&amp;div_max, <span class="dv">1</span>, MPI_INT, <span class="dv">0</span>, MPI_COMM_WORLD);
+MPI_Barrier( MPI_COMM_WORLD ) ;</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c"><span class="cf">for</span> (n=div_min; n&lt;div_max;n++) {
+    <span class="cf">if</span> (n == <span class="dv">0</span>) <span class="cf">break</span>;
+
+    h   = <span class="fl">1.0</span> / (<span class="dt">double</span>) n;
+    sum = <span class="fl">0.0</span>;
+    <span class="cf">for</span> (i = myid + <span class="dv">1</span>; i &lt;= n; i += numprocs) { <span class="co">//increment by numprocs</span>
+        x = h * ((<span class="dt">double</span>)i - <span class="fl">0.5</span>);
+        sum += <span class="fl">4.0</span> / (<span class="fl">1.0</span> + x*x);
+    }
+
+    mypi = h * sum;
+
+    MPI_Barrier( MPI_COMM_WORLD ) ;
+    MPI_Reduce(&amp;mypi, &amp;pi, <span class="dv">1</span>, MPI_DOUBLE, MPI_SUM, <span class="dv">0</span>, MPI_COMM_WORLD);
+
+    <span class="cf">if</span> (myid == <span class="dv">0</span>)
+        printf(<span class="st">&quot;(n=%d) pi is approximately %.16f, Error is %.16f</span><span class="sc">\n</span><span class="st">&quot;</span>,
+                n, pi, fabs(pi - PI25DT));
+}
+MPI_Finalize();</code></pre></div>
+<h2 id="mpi-standard-httpwww.mpi-forum.orgdocsdocs.html">MPI Standard : http://www.mpi-forum.org/docs/docs.html</h2>
+<h2 id="mpi-forum-httpwww.mpi-forum.org">MPI Forum : http://www.mpi-forum.org/</h2>
+<h2 id="mpi-implementations">MPI implementations:</h2>
+<p>– MPICH : http://www.mpich.org</p>
+<p>– MVAPICH : http://mvapich.cse.ohio-state.edu/</p>
+<p>– Intel MPI: http://software.intel.com/en-us/intel -mpi -library/</p>
+<p>– Open MPI : http://www.open-mpi.org/</p>
+<p>– IBM MPI, Cray MPI</p>
+<ul>
+<li>You will see some combination of these of the different computing cluster</li>
+</ul>
+</section>
+    </div>
+  </div>
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>

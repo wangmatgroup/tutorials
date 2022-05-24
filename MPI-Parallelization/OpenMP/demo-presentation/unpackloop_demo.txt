@@ -1,0 +1,91 @@
+% OpenMP demo 3: Unpacking Loops
+% UCSB GS3 Workshop
+% 6 Sept. 2017
+
+## Basic demo of OpenMP: Unpacking Loops
+
+### Concepts to pick up
++ unpack nested loop into single loop (discussion only)
++ assign chunks to processors through careful indexing
+
+## Example motivation
+
+Calculating materials properties involve multi-dimensional
+integrals 
+
+![](./elph.png)
+
+## Parallelization
+
+We will show psuedocode in  `Fortran` in the following example.
+
+Let's look at the code sturcture in serial
+
+~~~~~{.fortran}
+! ... code up here
+
+do ikpt= 1, nkpt
+  do mbnd=1, maxbnd
+    do nbnd=1, maxbnd
+       ! things computed here....
+    enddo
+  enddo
+enddo
+
+! code continues... 
+~~~~~
+
+##
+
+Let's now look at the same code with OpenMP directives
+
+~~~~~{.fortran}
+!.... code ....
+
+contains 
+
+subroutine calc_absorption(...)
+
+!... code ...
+
+#ifdef OMP
+
+!$omp parallel default(shared) private(loop_tot,loop_x,loop_y,loop_z,kpt,dipole_omp, my_thread_id,num_threads)
+
+     my_thread_id = omp_get_thread_num()
+     num_threads = omp_get_num_threads()
+#else
+     my_thread_id = 0
+     num_threads = 1
+#endif
+
+    do loop_tot=my_thread_id,nkpt-1,num_threads
+
+       loop_x= loop_tot/(kmesh(2)*kmesh(3))
+       loop_y=(loop_tot-loop_x*(kmesh(2)*kmesh(3)))/kmesh(3)
+       loop_z= loop_tot-loop_x*(kmesh(2)*kmesh(3)) -loop_y*kmesh(3)
+       
+       !.... code ....
+    enddo 
+
+#ifdef OMP
+!$omp end parallel 
+#endif
+
+!.... code ....
+
+end subroutine calc
+
+subroutine get_k(...)
+!.... code ....
+
+do ibnd = 1,maxbnd
+  do jbnd = 1,maxbnd
+       !.... code ....
+  enddo
+enddo
+
+!.... code ....
+end subroutine get_k
+~~~~~
+

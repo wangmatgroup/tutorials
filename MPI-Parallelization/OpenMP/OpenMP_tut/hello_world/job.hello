@@ -1,0 +1,8 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=4
+#PBS -l walltime=00:10:00
+#PBS -j oe
+#PBS -V
+cd $PBS_O_WORKDIR
+export OMP_NUM_THREADS = 4
+mpirun ./c_solution_hello_world.x  

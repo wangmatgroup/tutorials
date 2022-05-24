@@ -1,0 +1,176 @@
+% OpenMP demo 1: Hello World
+% UCSB GS3 Workshop
+% 6 Sept. 2017
+
+## Basic demo of OpenMP
+
+### Concepts we will learn
++ How threads work
++ Master v work threads
++ Synchronization
+
+## Parallelizing the code
+
+We will use `fortran` in the following example.
+
+Let's look at the code in serial
+
+~~~~~{.fortran}
+program hello_world
+
+    ! TODO: include OpenMP module
+
+    implicit none
+
+
+    ! TODO: Make the following code block parallel
+
+    ! TODO: Get the individual thread number in 'id'
+    integer :: thread_id = 0
+
+
+    ! Print Hello world from each thread
+    write ( *, * ) 'Hello World, thread ', thread_id
+
+    ! TODO: How do we have every thread print before executing 
+    ! the next line?
+
+    ! TODO: Now get the master thread to identify itself!
+    write ( *, * ) 'Master thread, id is always ', thread_id
+
+    ! TODO: Print again from each thread
+    write ( *, * ) 'Hello OpenMP, thread  ', thread_id
+
+    stop
+
+end program hello_world
+
+
+~~~~~
+
+##
+
+Let's now look at the same code with OpenMP directives
+
+~~~~~{.fortran}
+program hello_world
+
+    ! include OpenMP module
+    use omp_lib
+
+    implicit none
+
+    integer :: thread_id
+
+    ! Make the following code block parallel
+    !$omp parallel private(thread_id)
+
+        ! Getting the individual thread number in 'id'
+        thread_id = omp_get_thread_num()
+
+        ! Print Hello world from each thread
+        write ( *, * ) 'Hello World, thread ', thread_id
+
+        ! make sure every thread prints before executing 
+        ! the next line?
+        !$omp barrier
+
+        ! Only the master thread prints
+        !$omp master
+            write ( *, * ) 'Master thread, id is always ', thread_id
+        !$omp end master
+
+        ! Print again from each thread
+        write ( *, * ) 'Hello OpenMP, thread  ', thread_id
+
+    !$omp end parallel   
+    ! implicit barrier at end of parallel block
+
+    stop
+
+  end program hello_world
+
+~~~~~
+
+## Hello World: Compiling
+
+Machine and architecture dependent!
+
+~~~~~{.bash}
+-> wwwennie@knot:~ cd OpenMP_tut/hello_world
+-> wwwennie@knot:~/OpenMP_tut/hello_world make
+ifort -qopenmp -o fortran_helloworld_omp.x fortran_helloworld_omp.f90
+ifort -qopenmp -o fortran_helloworld_todo.x fortran_helloworld_todo.f90
+~~~~~
+
+## Hello World: Makefile
+
+~~~~~{.bash}
+FC              = ifort
+FFLAGS          = -qopenmp
+
+FORTRAN_SOURCES = $(wildcard *.f90)
+TARGETS = $(FORTRAN_SOURCES:.f90=.x)
+
+.PHONY: all     clean
+
+all:    $(TARGETS)
+
+clean: 
+	rm -f $(TARGETS)
+
+.SUFFIXES: .x 
+
+%.x: %.f90
+	$(FC) $(FFLAGS) -o $@ $^
+~~~~~
+
+## Running Hello World
+
+~~~~~{.bash}
+wwwennie@knot:~/OpenMP_tut/hello_world$ cat job.hello
+~~~~~
+
+~~~~~{.bash}
+#!/bin/bash
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=00:10:00
+#PBS -j oe
+#PBS -V
+cd $PBS_O_WORKDIR
+export OMP_NUM_THREADS = 12
+mpirun ./fortran_helloworld_omp.x 
+~~~~~
+
+~~~~~{.bash}
+wwwennie@knot:~/OpenMP_tut/hello_world$ qsub job.hello
+~~~~~
+
+## Output
+~~~~~{.bash}
+ Hello World, thread            3
+ Hello World, thread           11
+ Hello World, thread            8
+ Hello World, thread            5
+ Hello World, thread            6
+ Hello World, thread            0
+ Hello World, thread            4
+ Hello World, thread           10
+ Hello World, thread            9
+ Hello World, thread            1
+ Hello World, thread            2
+ Hello World, thread            7
+ Master thread, id is always            0
+ Hello OpenMP, thread             8
+ Hello OpenMP, thread             6
+ Hello OpenMP, thread             3
+ Hello OpenMP, thread             7
+ Hello OpenMP, thread             0
+ Hello OpenMP, thread             2
+ Hello OpenMP, thread             5
+ Hello OpenMP, thread            11
+ Hello OpenMP, thread             9
+ Hello OpenMP, thread             4
+ Hello OpenMP, thread            10
+ Hello OpenMP, thread             1
+~~~~~

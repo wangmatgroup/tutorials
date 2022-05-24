@@ -1,0 +1,19 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=4
+#PBS -l walltime=01:00:00
+#PBS -j oe
+#PBS -V
+cd $PBS_O_WORKDIR
+export OMP_NUM_THREADS=4
+#echo "NO parallelization"
+#echo "-----------------------"
+#mpirun ./fortran_checker_todo.x 
+#echo "WITH parallelization"
+#echo "-----------------------"
+#mpirun ./fortran_checker_omp.x
+echo "NO parallelization"
+echo "-----------------------"
+mpirun ./cpp_checker_todo.x 
+echo "WITH parallelization"
+echo "-----------------------"
+mpirun ./cpp_checker_omp.x
