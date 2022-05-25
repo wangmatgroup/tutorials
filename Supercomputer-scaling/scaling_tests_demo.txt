@@ -1,0 +1,247 @@
+% Tutorial: \
+  Scaling tests
+% Wang Materials Group Meeting
+% 25 May 2022
+
+## Concepts for today
+
++ Basics of parallelization
++ Jobs on the supercomputer
++ What are scaling tests
++ Why do we do scaling tests
++ How do we do scaling tests 
++ Scaling test write-up
+
+## Basics of parallelization
+
+Serial v parallel: Which compute tasks are independent and would benefit from multiple processors?
+
+Basic architecture (see also e.g., [here](https://curc.readthedocs.io/en/latest/programming/parallel-programming-fundamentals.html))
+
+![](./parallel-arch.png)
+
+## 
+
++ A primer on the various jargon: node, core, processor, processes, tasks, etc.
++ See also [here](https://smileipic.github.io/Smilei/parallelization.html)
+
+![](NodesCoresThreads.png)
+
+##
+
+Example: Stampede2 (see also [documentation](https://portal.tacc.utexas.edu/user-guides/stampede2))
+
++ 240 Intel "Ice Lake" (ICX) compute nodes, replacing 448 KNL compute nodes
++ Knights Landing (KNL) compute nodes each have 68 cores
++ Skylake (SKX) compute nodes each have 48 cores
+
+![](knl-arch-stampede2.png)
+
+## Jobs on the supercomputer
+
+Example: [Stampede2 at TACC](https://portal.tacc.utexas.edu/software/qe)
+
+![](QE-at-TACC.png)
+
+## Jobs on the supercomputer
+
+Example: Logging into [Stampede2 at TACC](https://portal.tacc.utexas.edu/software/qe)
+
+~~~~~{.bash}
+ssh -X <your-xsede-username>@stampede2.tacc.utexas.edu
+~~~~~
+
+## 
+
+~~~~~{.bash}
+The authenticity of host 'stampede2.tacc.utexas.edu (129.114.63.44)' can't be established.
+ECDSA key fingerprint is SHA256:SegC2YyyftiRpdwhXqNZE+15RyGeFSal4Vuz0HYJ5E8.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'stampede2.tacc.utexas.edu,129.114.63.44' (ECDSA) to the list of known hosts.
+
+To access the system:
+
+1) If not using ssh-keys, please enter your TACC password at the password prompt
+2) At the TACC Token prompt, enter your 6-digit code followed by <return>.
+Password: 
+TACC Token Code:
+Last login: Thu Feb 14 11:37:13 2019 from 149.165.168.51
+------------------------------------------------------------------------------
+                   Welcome to the Stampede2 Supercomputer
+      Texas Advanced Computing Center, The University of Texas at Austin
+------------------------------------------------------------------------------
+
+              ** Unauthorized use/access is prohibited. **
+
+If you log on to this computer system, you acknowledge your awareness
+of and concurrence with the UT Austin Acceptable Use Policy. The
+University will prosecute violators to the full extent of the law.
+
+TACC Usage Policies:
+http://www.tacc.utexas.edu/user-services/usage-policies/
+______________________________________________________________________________
+
+Welcome to Stampede2, *please* read these important system notes:
+
+--> Stampede2 user documentation is available at:
+       https://portal.tacc.utexas.edu/user-guides/stampede2
+
+2/24/2022:  OS was updated to latest CentOS 7.9 release along with Slurm 20,
+            OPA 10.11 and Lustre 2.12 updates.  Please submit a support ticket
+            if you encounter any issues after the update.
+
+            The icx-normal queue is now available for users, up to 40 nodes
+            with 80 cores per node for a single job.
+--------------------- Project balances for user wwwennie ----------------------
+| Name           Avail SUs     Expires |                                      |
+| TG-MAT220010        1600  2023-04-06 |                                      |
+------------------------ Disk quotas for user wwwennie ------------------------
+| Disk         Usage (GB)     Limit    %Used   File Usage       Limit   %Used |
+| /home1              2.4      10.0    24.34         3541      200000    1.77 |
+| /work2              0.0    1024.0     0.00            3     3000000    0.00 |
+| /scratch            0.0       0.0     0.00           66           0    0.00 |
+-------------------------------------------------------------------------------
+~~~~~
+
+## Jobs on the supercomputer
+
+Example: [Stampede2 at TACC](https://portal.tacc.utexas.edu/software/qe)
+
+job.script
+
+~~~~~{.bash}
+#!/bin/bash 
+#SBATCH -J qe                               # define the job name
+#SBATCH -o qe.%j.out                        # define stdout & stderr output files 
+#SBATCH -e qe.%j.err 
+#SBATCH -N 4                                # request 4 nodes 
+#SBATCH -n 256                              # 256 total tasks = 64 tasks/node
+#SBATCH -p normal                           # submit to "normal" queue 
+#SBATCH -t 4:00:00                          # run for 4 hours max 
+#SBATCH -A projectname
+
+module load qe/6.2.1                        # setup environment
+ibrun pw.x -input qeinput > qe_test.out     # launch job
+~~~~~
+
+~~~~{.bash}
+sbatch job.script
+~~~~
+
+## Parallelization in DFT codes
+
++ Every code has a scheme of parallelization- it is important to understand what these levels are and how well they perform
++ The goal is to load balance so that no cores are unnecessarily idle
+
+## Parallelization in DFT codes
+
+Example: Quantum ESPRESSO
+
++ Parallelize 8 images across 512 processors; for each image:
+   + 2 pools of over k-points with 256 processors; 
+   + 4 task groups for the 3D FFT with 64 processors each
+   + 144 processors for diagonalization of subspace Hamiltonian 	
+
+~~~~~~{.bash}
+mpirun -np 4096 ./neb.x -ni 8 -nk 2 -nt 4 -nd 144 -i my.input
+~~~~~~
+
+## What are scaling tests
+
+Goal: find the parallelization with most efficient use of resources
+
+How do you choose the parallelization  parameters? 
+
+--> Reading documentation/forums, doing tutorials and small test cases, doing scaling tests!
+
+Scaling tests: extrapolating resource usage efficiency based on small tests of parallelization schemes
+
+## Why we do scaling tests
+
++ DFT codes scale with $O(N^3)$ where $N$ is some measure of system size (e.g., number of electrons, number of bands)
+
++ In general, not all parts of a DFT calculation scales linearly with processors
+
++ A simulation cell of about 100 atoms could take anywhere between a few hours to a few weeks (e.g., depending on functional)
+
+## Why we do scaling tests
+
++ Not enough parallelization: wait too long for calculatoin to finish
+
++ Improper parallelization: waste of hours (and energy!) 
+
+## How do we do scaling tests
+
+1. set up a working calculation that is representative of the calculations you anticipate for the project
+
+2. enumerate a few parallelization schemes
+
+3. run the minimum calculation needed 
+ + e.g., single scf cycle, extrapolate to number needed for atomic relaxation
+ + e.g., single q-point phonone mode calculation, extrapolate to entire q-point mesh
+
+4. collect data, visualize, and pick a scheme
+
+## Example: Scaling test
+
++ Comparing WO$_3$ and SrTiO$_3$ electron transport properties
++ do tests with and without spin-orbit coupling
++ need to compute many phonons on a dense grid
++ find out time to compute one phonon; repeat for all cases of WO$_3$ and SrTiO$_3$
++ Paper: [link](https://dx.doi.org/10.1103/PhysRevB.101.045116)
+
+## Example: Scaling test
+
++ One way to automate the scaling test (but first, try a few test cases!)
+ 
+set_scaling.sh
+
+~~~~~{.bash}
+#!/bin/bash
+
+proc=(144 160 320)
+npool=(2 4 6 8)
+
+for i in "${proc[@]}"; do
+   for j in "${npool[@]}"; do
+       mkdir p${i}n${j}
+       cd p${i}n${j}
+
+       # copy template input files
+       cp -r ../input.in ../*UPF ../phrun.sh .
+       
+       # substitute parallelization into run command 
+       # of a template job submission script called phrun.sh
+       sed -i "s/REPL1/${i}/g" phrun.sh
+       sed -i "s/REPL2/${j}/g" phrun.sh
+       cd ../
+   done
+done
+~~~~~
+
+~~~~{.bash}
+wwwennie@stampede2 scaling-test $ ls
+p144n2  p144n4  p144n6  p144n8  p160n2  p160n4  p160n6  p160n8  p320n2  p320n4  p320n6  p320n8  set_scaling.sh
+~~~~
+
+## Example: Scaling test
+
+![](cubic-elph.png)
+
+## Writing up scaling tests
+
++ Progress Report (if relevant)
++ Scientific Research Objective: What is the goal of the calculation?
++ Computational Methodology, Applications/Codes
++ Application efficiencies
++ Computational Research Plan
++ Justification of computer SUs and memory requirements
+
+
+## Writing up scaling tests
+
++ aim to do tests on anticipate machine architecture
++ add some buffer to the hours requested- failed jobs, testing of parameters not known at time of scaling tests, etc.
+
+[Group wiki: Example write up](https://wikis.utexas.edu/download/attachments/360416757/XSEDE2018-WW.pdf?version=1&modificationDate=1653437358790&api=v2)
+
