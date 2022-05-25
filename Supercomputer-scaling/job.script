@@ -1,0 +1,12 @@
+#!/bin/bash 
+#SBATCH -J qe                               # define the job name
+#SBATCH -o qe.%j.out                        # define stdout & stderr output files 
+#SBATCH -e qe.%j.err 
+#SBATCH -N 4                                # request 4 nodes 
+#SBATCH -n 256                              # 256 total tasks = 64 tasks/node
+#SBATCH -p normal                           # submit to "normal" queue 
+#SBATCH -t 4:00:00                          # run for 4 hours max 
+#SBATCH -A projectname
+
+module load qe/6.2.1                        # setup environment
+ibrun pw.x -input qeinput > qe_test.out     # launch job
