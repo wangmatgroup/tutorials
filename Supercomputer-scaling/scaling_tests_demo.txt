@@ -148,13 +148,13 @@ mpirun -np 4096 ./neb.x -ni 8 -nk 2 -nt 4 -nd 144 -i my.input
 
 ## What are scaling tests
 
-Goal: find the parallelization with most efficient use of resources
+Goal: find most efficient parallelization scheme
 
 How do you choose the parallelization  parameters? 
 
---> Reading documentation/forums, doing tutorials and small test cases, doing scaling tests!
+--> Documentation/forums, tutorials and small test cases, scaling tests!
 
-Scaling tests: extrapolating resource usage efficiency based on small tests of parallelization schemes
+Scaling tests: estimating resource usage based on small tests of parallelization schemes
 
 ## Why we do scaling tests
 
@@ -177,8 +177,8 @@ Scaling tests: extrapolating resource usage efficiency based on small tests of p
 2. enumerate a few parallelization schemes
 
 3. run the minimum calculation needed 
- + e.g., single scf cycle, extrapolate to number needed for atomic relaxation
- + e.g., single q-point phonone mode calculation, extrapolate to entire q-point mesh
+ + e.g., single scf cycle, extrapolate to atomic relaxation
+ + e.g., single q-point phonon calculation, extrapolate to q-point mesh
 
 4. collect data, visualize, and pick a scheme
 
@@ -187,8 +187,8 @@ Scaling tests: extrapolating resource usage efficiency based on small tests of p
 + Comparing WO$_3$ and SrTiO$_3$ electron transport properties
 + do tests with and without spin-orbit coupling
 + need to compute many phonons on a dense grid
-+ find out time to compute one phonon; repeat for all cases of WO$_3$ and SrTiO$_3$
-+ Paper: [link](https://dx.doi.org/10.1103/PhysRevB.101.045116)
++ find out time to compute one phonon; repeat for all cases 
++ Paper: [doi:10.1103/PhysRevB.101.045116](https://dx.doi.org/10.1103/PhysRevB.101.045116)
 
 ## Example: Scaling test
 
@@ -204,16 +204,12 @@ npool=(2 4 6 8)
 
 for i in "${proc[@]}"; do
    for j in "${npool[@]}"; do
-       mkdir p${i}n${j}
-       cd p${i}n${j}
-
+       mkdir p${i}n${j}; cd p${i}n${j}
        # copy template input files
        cp -r ../input.in ../*UPF ../phrun.sh .
-       
        # substitute parallelization into run command 
        # of a template job submission script called phrun.sh
-       sed -i "s/REPL1/${i}/g" phrun.sh
-       sed -i "s/REPL2/${j}/g" phrun.sh
+       sed -i "s/REPL1/${i}/g" phrun.sh; sed -i "s/REPL2/${j}/g" phrun.sh
        cd ../
    done
 done
