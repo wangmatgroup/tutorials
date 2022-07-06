@@ -1,11 +1,6 @@
-# MPI/OpenMP tutorial
+# Scaling tests on supercomputing clusters
 
-Contains:
-Tutorial files in Fortran and C for MPI and OpenMP
-Accompanying presentations
-Configured for UCSB Knot cluster, though easily adaptable to other machines
+Tutorial on scaling tests. Example case for machines at TACC.
+Download and open in browser `scaling_tests_demo.html` for main presentation.
 
-Created by jmmshen and wwwennie
-
-Presented at UCSB GS^3 tutorial session, Sept 6 2017
-
+Last updated: 06-July-2022

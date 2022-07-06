@@ -1,0 +1,54 @@
+!===================================
+!========= bulk cubic WO3 ==========
+!===================================
+
+SYSTEM = WO3bulkRT      !Header
+
+!======== Precision parameters =========
+ALGO = Normal           !Electronic minimization algorithm
+PREC = Normal           !Precision of FFT grid, etc.
+ENCUT = 500             !Energy cutoff of pw basis set
+
+!======== Convergence parameters =========
+NSW    = 0             !Max number of ionic steps
+EDIFFG = -0.04        !Max force difference between ionic steps for convergen$
+EDIFF  = -0.001        !Max energy difference between electronic SC steps for $
+NELMIN = 8              !Minimum number of electronic steps
+NELM = 30
+!POTIM = 0.3
+
+NBANDS = 144
+NPAR = 24
+KPAR = 6
+!ISYM = 0
+!LORBIT = 11
+
+!========= Smearing ================
+ISMEAR = 0              !tetrahedron with Bloechl
+SIGMA = 0.01             !Extent of smearing in eV, similar to Si example
+
+!========= Ion relax =========
+IBRION = -1              !conjugate gradient method
+ISIF = 3                !relax ions, cell shape/volume
+
+!====== optics ==========
+NSW = 0
+IBRION = -1
+LOPTICS = .TRUE.
+NEDOS = 3000            !recommended by vasp
+ADDBAND = 48
+
+
+!======= Band decompose charge density ============
+! --------- post-processing only --------------
+!LPARD = TRUE             !band decomposed charge density
+!LSEPB = TRUE             !sep charge density for each band
+
+!========== Things for HSE ===========
+LHFCALC = .TRUE.      !perform HSE
+HFSCREEN = 0.2        !screening factor
+TIME = 0.4
+PRECFOCK = F
+!NKRED = 1
+AEXX = 0.25           !mixing parameter
+
