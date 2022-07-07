@@ -19,10 +19,11 @@
                     ecutwfc = 90
                    !nosym = .FALSE.
                    occupations =  'fixed'
-                   smearing =  'mv'
-                   degauss = 0.0001
-                    nspin = 1
-                    nbnd = 448 
+                   nspin = 1
+                   nbnd = 448 
+                   !! DFT+U, minimum parameters
+                   lda_plus_u = .TRUE.  Hubbard_U(2) = 2.7
+                   !! DDH functional
                    !input_dft ='pbe0'
                    !nqx1 = 2, nqx2 = 2, nqx3 = 1,
                    !screening_parameter = 0.106
@@ -30,9 +31,6 @@
                    !exxdiv_treatment =  'gygi-baldereschi'
                    !ecutfock = 180
                    !!ecutvcut = 0.7
-                   lda_plus_u = .TRUE.  Hubbard_U(2) = 2.7
-                   !starting_magnetization(2) = 0.d0
-                   !tot_magnetization = 0.d0
  /
  &ELECTRONS
             electron_maxstep = 200
