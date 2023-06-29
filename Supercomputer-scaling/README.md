@@ -1,10 +1,11 @@
-# MPI/OpenMP tutorial
+# Performaing Scaling tests tutorial
 
 Contains:
-Tutorial files in Fortran and C for MPI and OpenMP
-Accompanying presentations
-Configured for UCSB Knot cluster, though easily adaptable to other machines
+- Slides describing the process and motivation of scaling tests, adapted to resources at TACC
+    - html rendered using pandoc (https://pandoc.org/) 
+    - slides version of html with reveal.js (https://revealjs.com/) (optional)
+    - see slidepandoc.sh for the script to render the \*html presentation
+- Example of a scaling test report 
 
-Created by jmmshen and wwwennie
 
-Presented at UCSB GS^3 tutorial session, Sept 6 2017
+

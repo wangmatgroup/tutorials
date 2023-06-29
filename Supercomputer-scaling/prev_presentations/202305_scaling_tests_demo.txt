@@ -1,7 +1,7 @@
 % Tutorial: \
   Scaling tests
-% Wang Materials Group, UT Austin
-% Updated: June 2023 
+% Wang Materials Group Meeting
+% 25 May 2022
 
 ## Concepts for today
 
@@ -29,47 +29,26 @@ Basic architecture (see also e.g., [here](https://curc.readthedocs.io/en/latest/
 
 ##
 
-Example: Stampede2 (see also [documentation](https://docs.tacc.utexas.edu/hpc/stampede2/))
+Example: Stampede2 (see also [documentation](https://portal.tacc.utexas.edu/user-guides/stampede2))
 
 + 240 Intel "Ice Lake" (ICX) compute nodes, replacing 448 KNL compute nodes
 + Knights Landing (KNL) compute nodes each have 68 cores
 + Skylake (SKX) compute nodes each have 48 cores
-+ [SLURM job scheduler](https://slurm.schedmd.com/quickstart.html) 
-+ Note: Stampede2 will retire November 30, 2023
 
 ![](knl-arch-stampede2.png)
 
-##
+## Jobs on the supercomputer
 
-Example: Lonestar6 (see also [documentation](https://docs.tacc.utexas.edu/hpc/lonestar6/))
-
-+ 560 AMD Milan compute nodes, each 128 cores on two sockets (64 cores/socket)
-+ 32 GPU nodes with NVIDIA A100
-
-![](lonestar6-arch.png)
-
-## Software modules on the supercomputer
-
-+ [QE at TACC](https://docs.tacc.utexas.edu/software/quantumespresso/)
+Example: [Stampede2 at TACC](https://portal.tacc.utexas.edu/software/qe)
 
 ![](QE-at-TACC.png)
 
-+ [VASP at TACC](https://docs.tacc.utexas.edu/software/vasp/)
-
-![](VASP-at-TACC.png)
-
 ## Jobs on the supercomputer
 
-Example: Accessing TACC resources
-
-+ Will depend on which machine you are using. 
+Example: Logging into [Stampede2 at TACC](https://portal.tacc.utexas.edu/software/qe)
 
 ~~~~~{.bash}
-ssh -X <your-username>@stampede2.tacc.utexas.edu
-~~~~~
-
-~~~~~{.bash}
-ssh -X <you-username>@ls6.tacc.utexas.edu
+ssh -X <your-xsede-username>@stampede2.tacc.utexas.edu
 ~~~~~
 
 ## 
@@ -126,9 +105,9 @@ Welcome to Stampede2, *please* read these important system notes:
 
 ## Jobs on the supercomputer
 
-Example: [Stampede2 at TACC](https://docs.tacc.utexas.edu/software/quantumespresso/)
+Example: [Stampede2 at TACC](https://portal.tacc.utexas.edu/software/qe)
 
-+ see also ```job.script```
+job.script
 
 ~~~~~{.bash}
 #!/bin/bash 
@@ -161,8 +140,7 @@ Example: Quantum ESPRESSO
 + Parallelize 8 images across 512 processors; for each image:
    + 2 pools of over k-points with 256 processors; 
    + 4 task groups for the 3D FFT with 64 processors each
-   + 144 processes for diagonalization of subspace Hamiltonian 	
-+ 512 processors/image * 8 images = 4096 processors requested in total
+   + 144 processors for diagonalization of subspace Hamiltonian 	
 
 ~~~~~~{.bash}
 mpirun -np 4096 ./neb.x -ni 8 -nk 2 -nt 4 -nd 144 -i my.input
@@ -172,68 +150,58 @@ mpirun -np 4096 ./neb.x -ni 8 -nk 2 -nt 4 -nd 144 -i my.input
 
 Goal: find most efficient parallelization scheme
 
-How do you choose the parallelization parameters? 
+How do you choose the parallelization  parameters? 
 
---> Documentation/forums, tutorials and small test cases, and scaling tests!
+--> Documentation/forums, tutorials and small test cases, scaling tests!
 
-Scaling tests: estimating resource usage; in this case, based on small tests of parallelization schemes
-
-TACC measures compute sources in terms of [Service Units (SUs)](https://www.tacc.utexas.edu/use-tacc/allocations/) 
-
-```SUs charged = (Number of nodes) x (job wall-clock time) x (multiplier, which depends on machine)```
+Scaling tests: estimating resource usage based on small tests of parallelization schemes
 
 ## Why we do scaling tests
 
-+ DFT codes scale with $O(N^3)$ where $N$ is some measure of system size (e.g., number of electrons, number of bands, number of k-points)
++ DFT codes scale with $O(N^3)$ where $N$ is some measure of system size (e.g., number of electrons, number of bands)
 
-+ In general, not all parts of a DFT calculation scales linearly with processors ([general scaling in HPC](https://hpc-wiki.info/hpc/Scaling))
++ In general, not all parts of a DFT calculation scales linearly with processors
 
 + A simulation cell of about 100 atoms could take anywhere between a few hours to a few weeks (e.g., depending on functional)
 
 ## Why we do scaling tests
 
-+ To find the most efficient and optimal running scheme!
++ Not enough parallelization: wait too long for calculatoin to finish
 
-+ Not enough parallelization: wait too long for calculation to finish
-
-+ Improper parallelization: idle processors, waste of hours, waste of energy! (see also e.g., [Green Algorithms 4 HPC](https://www.green-algorithms.org/GA4HPC/)
++ Improper parallelization: waste of hours (and energy!) 
 
 ## How do we do scaling tests
 
-1. set up a working calculation that is representative of the types of calculations you anticipate for the project within the next allocation period (usually 6 months to a year). 
+1. set up a working calculation that is representative of the calculations you anticipate for the project
 
-2. enumerate a few parallelization schemes and set up your calculations
+2. enumerate a few parallelization schemes
 
 3. run the minimum calculation needed 
- + e.g., run a single or a few scf cycles, estimate number of scf cycles required to run ionic relaxations
- + e.g., run single q-point phonon calculation, extrapolate to get total estimated time to run full q-point mesh
+ + e.g., single scf cycle, extrapolate to atomic relaxation
+ + e.g., single q-point phonon calculation, extrapolate to q-point mesh
 
-4. collect data on timings, plot the timings, and pick a scheme that is close to linear scaling but does not substantially waste resources
+4. collect data, visualize, and pick a scheme
 
-## Example Scaling test
+## Example: Scaling test
 
 + Comparing WO$_3$ and SrTiO$_3$ electron transport properties
-+ do tests with and without spin-orbit coupling (SOC)
++ do tests with and without spin-orbit coupling
 + need to compute many phonons on a dense grid
-+ find out time to compute single phonon; repeat for with and without SOC
++ find out time to compute one phonon; repeat for all cases 
 + Paper: [doi:10.1103/PhysRevB.101.045116](https://dx.doi.org/10.1103/PhysRevB.101.045116)
 
 ## Example: Scaling test
 
-+ A basic way to set up the calculations for running each parallelization scheme
++ One way to automate the scaling test (but first, try a few test cases!)
  
 set_scaling.sh
 
 ~~~~~{.bash}
 #!/bin/bash
 
-proc=(144 160 320)  # number of requested processors
-npool=(2 4 6 8)     # using k-point parallelization in QE
+proc=(144 160 320)
+npool=(2 4 6 8)
 
-# loop over each possible combination of processors
-# and k-point parallelization
-# make a separate directory p<processors>n<pools>
-# generate correpsonding input files and job submission script
 for i in "${proc[@]}"; do
    for j in "${npool[@]}"; do
        mkdir p${i}n${j}; cd p${i}n${j}
@@ -254,37 +222,22 @@ p144n2  p144n4  p144n6  p144n8  p160n2  p160n4  p160n6  p160n8  p320n2  p320n4  
 
 ## Example: Scaling test
 
-+ Collect the total wall-clock time for a single phonon and plot 
-+ we plot scaling 1/time v number of processors
-+ In ideal scaling, doubling the number of processors would halve the wall-clock time
-+ In reality, at some point, running with more processors often leads to sub-linear scaling
-+ One potential cause for sub-linear scaling is increased overhead of communication between interconnects, especially for large memory jobs
-+ In this case, we chose to use the parallelization scheme with 28 processors. While the scaling is sub-linear, the added speed in calculations was deemed worthwhile given the dense q-point grids this calculation would be repeated over (i.e., some computational efficiency was traded for human-time speed).   
-
 ![](cubic-elph.png)
-
-## Writing up scaling tests in allocation proposals 
-
-+ Progress Report: 
-   + Preliminary results, papers published with allocation
-+ Scientific Research Objective
-   + What is the goal of the calculation?
-   + Describe the project
-+ Computational Methodology
-   + What methods will you use? 
-   + Are the proposed methods appropriate and feasible?
-   + How will HPC resources play a role in your calculations?
-+ Applications/Codes: Will the software require any special setup?
-+ Application efficiencies: Scaling tests
-+ Computational Research Plan
-   + What types of calculations are planned for the proposed allocation?
-+ Justification of computer SUs and memory requirements
-
-Each HPC center has its own allocation cycle and policies (e.g., at [TACC](https://allocations.access-ci.org/prepare-requests-overview))
 
 ## Writing up scaling tests
 
-+ aim to do tests on anticipated machine architecture
-+ add some buffer to the estimated hours requested; there will be failed jobs, testing of parameters not known at time of scaling tests, etc.
++ Progress Report (if relevant)
++ Scientific Research Objective: What is the goal of the calculation?
++ Computational Methodology, Applications/Codes
++ Application efficiencies
++ Computational Research Plan
++ Justification of computer SUs and memory requirements
 
-[Group Box Example writeup](https://utexas.box.com/s/v66fdky6slqvqc87i6mc7ydks43mp4yx); must have UT EID
+
+## Writing up scaling tests
+
++ aim to do tests on anticipate machine architecture
++ add some buffer to the hours requested- failed jobs, testing of parameters not known at time of scaling tests, etc.
+
+[Group wiki: Example write up](https://wikis.utexas.edu/download/attachments/360416757/XSEDE2018-WW.pdf?version=1&modificationDate=1653437358790&api=v2)
+

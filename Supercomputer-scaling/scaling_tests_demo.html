@@ -3,74 +3,103 @@
 <head>
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
-  <meta name="author" content="Wang Materials Group Meeting">
-  <meta name="dcterms.date" content="2022-05-25">
+  <meta name="author" content="Wang Materials Group, UT Austin">
   <title>Tutorial: Scaling tests</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="https://unpkg.com/reveal.js@3.9.2//css/reveal.css">
-  <style type="text/css">code{white-space: pre;}</style>
-  <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@3.9.2//dist/reset.css">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@3.9.2//dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="https://unpkg.com/reveal.js@3.9.2//css/theme/white.css" id="theme">
-  <!-- Printing and PDF exports -->
-  <script>
-    var link = document.createElement( 'link' );
-    link.rel = 'stylesheet';
-    link.type = 'text/css';
-    link.href = window.location.search.match( /print-pdf/gi ) ? 'https://unpkg.com/reveal.js@3.9.2//css/print/pdf.css' : 'https://unpkg.com/reveal.js@3.9.2//css/print/paper.css';
-    document.getElementsByTagName( 'head' )[0].appendChild( link );
-  </script>
-  <!--[if lt IE 9]>
-  <script src="https://unpkg.com/reveal.js@3.9.2//lib/js/html5shiv.js"></script>
-  <![endif]-->
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@3.9.2//dist/theme/white.css" id="theme">
 </head>
 <body>
   <div class="reveal">
     <div class="slides">
 
-<section>
+<section id="title-slide">
   <h1 class="title">Tutorial:<br />
 Scaling tests</h1>
-  <p class="author">Wang Materials Group Meeting</p>
-  <p class="date">25 May 2022</p>
+  <p class="author">Wang Materials Group, UT Austin</p>
+  <p class="date">Updated: June 2023</p>
 </section>
 
 <section id="concepts-for-today" class="slide level2">
@@ -86,246 +115,523 @@ Scaling tests</h1>
 </section>
 <section id="basics-of-parallelization" class="slide level2">
 <h2>Basics of parallelization</h2>
-<p>Serial v parallel: Which compute tasks are independent and would benefit from multiple processors?</p>
-<p>Basic architecture (see also e.g., <a href="https://curc.readthedocs.io/en/latest/programming/parallel-programming-fundamentals.html">here</a>)</p>
-<figure>
-<img src="./parallel-arch.png" />
-</figure>
+<p>Serial v parallel: Which compute tasks are independent and would
+benefit from multiple processors?</p>
+<p>Basic architecture (see also e.g., <a
+href="https://curc.readthedocs.io/en/latest/programming/parallel-programming-fundamentals.html">here</a>)</p>
+<p><img data-src="./parallel-arch.png" /></p>
 </section>
 <section id="section" class="slide level2">
 <h2></h2>
 <ul>
-<li>A primer on the various jargon: node, core, processor, processes, tasks, etc.</li>
-<li>See also <a href="https://smileipic.github.io/Smilei/parallelization.html">here</a></li>
+<li>A primer on the various jargon: node, core, processor, processes,
+tasks, etc.</li>
+<li>See also <a
+href="https://smileipic.github.io/Smilei/parallelization.html">here</a></li>
 </ul>
-<figure>
-<img src="NodesCoresThreads.png" />
-</figure>
+<p><img data-src="NodesCoresThreads.png" /></p>
 </section>
 <section id="section-1" class="slide level2">
 <h2></h2>
-<p>Example: Stampede2 (see also <a href="https://portal.tacc.utexas.edu/user-guides/stampede2">documentation</a>)</p>
+<p>Example: Stampede2 (see also <a
+href="https://docs.tacc.utexas.edu/hpc/stampede2/">documentation</a>)</p>
 <ul>
-<li>240 Intel &quot;Ice Lake&quot; (ICX) compute nodes, replacing 448 KNL compute nodes</li>
+<li>240 Intel “Ice Lake” (ICX) compute nodes, replacing 448 KNL compute
+nodes</li>
 <li>Knights Landing (KNL) compute nodes each have 68 cores</li>
 <li>Skylake (SKX) compute nodes each have 48 cores</li>
+<li><a href="https://slurm.schedmd.com/quickstart.html">SLURM job
+scheduler</a></li>
+<li>Note: Stampede2 will retire November 30, 2023</li>
 </ul>
-<figure>
-<img src="knl-arch-stampede2.png" />
-</figure>
-</section>
-<section id="jobs-on-the-supercomputer" class="slide level2">
-<h2>Jobs on the supercomputer</h2>
-<p>Example: <a href="https://portal.tacc.utexas.edu/software/qe">Stampede2 at TACC</a></p>
-<figure>
-<img src="QE-at-TACC.png" />
-</figure>
-</section>
-<section id="jobs-on-the-supercomputer-1" class="slide level2">
-<h2>Jobs on the supercomputer</h2>
-<p>Example: Logging into <a href="https://portal.tacc.utexas.edu/software/qe">Stampede2 at TACC</a></p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">ssh</span> -X <span class="op">&lt;</span>your-xsede-username<span class="op">&gt;</span>@stampede2.tacc.utexas.edu</code></pre></div>
+<p><img data-src="knl-arch-stampede2.png" /></p>
 </section>
 <section id="section-2" class="slide level2">
 <h2></h2>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">The</span> authenticity of host <span class="st">&#39;stampede2.tacc.utexas.edu (129.114.63.44)&#39;</span> can<span class="st">&#39;t be established.</span>
-<span class="st">ECDSA key fingerprint is SHA256:SegC2YyyftiRpdwhXqNZE+15RyGeFSal4Vuz0HYJ5E8.</span>
-<span class="st">Are you sure you want to continue connecting (yes/no/[fingerprint])? yes</span>
-<span class="st">Warning: Permanently added &#39;</span>stampede2.tacc.utexas.edu,129.114.63.44<span class="st">&#39; (ECDSA) to the list of known hosts.</span>
-
-<span class="st">To access the system:</span>
-
-<span class="st">1) If not using ssh-keys, please enter your TACC password at the password prompt</span>
-<span class="st">2) At the TACC Token prompt, enter your 6-digit code followed by &lt;return&gt;.</span>
-<span class="st">Password: </span>
-<span class="st">TACC Token Code:</span>
-<span class="st">Last login: Thu Feb 14 11:37:13 2019 from 149.165.168.51</span>
-<span class="st">------------------------------------------------------------------------------</span>
-<span class="st">                   Welcome to the Stampede2 Supercomputer</span>
-<span class="st">      Texas Advanced Computing Center, The University of Texas at Austin</span>
-<span class="st">------------------------------------------------------------------------------</span>
-
-<span class="st">              ** Unauthorized use/access is prohibited. **</span>
-
-<span class="st">If you log on to this computer system, you acknowledge your awareness</span>
-<span class="st">of and concurrence with the UT Austin Acceptable Use Policy. The</span>
-<span class="st">University will prosecute violators to the full extent of the law.</span>
-
-<span class="st">TACC Usage Policies:</span>
-<span class="st">http://www.tacc.utexas.edu/user-services/usage-policies/</span>
-<span class="st">______________________________________________________________________________</span>
-
-<span class="st">Welcome to Stampede2, *please* read these important system notes:</span>
-
-<span class="st">--&gt; Stampede2 user documentation is available at:</span>
-<span class="st">       https://portal.tacc.utexas.edu/user-guides/stampede2</span>
-
-<span class="st">2/24/2022:  OS was updated to latest CentOS 7.9 release along with Slurm 20,</span>
-<span class="st">            OPA 10.11 and Lustre 2.12 updates.  Please submit a support ticket</span>
-<span class="st">            if you encounter any issues after the update.</span>
-
-<span class="st">            The icx-normal queue is now available for users, up to 40 nodes</span>
-<span class="st">            with 80 cores per node for a single job.</span>
-<span class="st">--------------------- Project balances for user wwwennie ----------------------</span>
-<span class="st">| Name           Avail SUs     Expires |                                      |</span>
-<span class="st">| TG-MAT220010        1600  2023-04-06 |                                      |</span>
-<span class="st">------------------------ Disk quotas for user wwwennie ------------------------</span>
-<span class="st">| Disk         Usage (GB)     Limit    %Used   File Usage       Limit   %Used |</span>
-<span class="st">| /home1              2.4      10.0    24.34         3541      200000    1.77 |</span>
-<span class="st">| /work2              0.0    1024.0     0.00            3     3000000    0.00 |</span>
-<span class="st">| /scratch            0.0       0.0     0.00           66           0    0.00 |</span>
-<span class="st">-------------------------------------------------------------------------------</span></code></pre></div>
+<p>Example: Lonestar6 (see also <a
+href="https://docs.tacc.utexas.edu/hpc/lonestar6/">documentation</a>)</p>
+<ul>
+<li>560 AMD Milan compute nodes, each 128 cores on two sockets (64
+cores/socket)</li>
+<li>32 GPU nodes with NVIDIA A100</li>
+</ul>
+<p><img data-src="lonestar6-arch.png" /></p>
 </section>
-<section id="jobs-on-the-supercomputer-2" class="slide level2">
+<section id="software-modules-on-the-supercomputer"
+class="slide level2">
+<h2>Software modules on the supercomputer</h2>
+<ul>
+<li><a href="https://docs.tacc.utexas.edu/software/quantumespresso/">QE
+at TACC</a></li>
+</ul>
+<p><img data-src="QE-at-TACC.png" /></p>
+<ul>
+<li><a href="https://docs.tacc.utexas.edu/software/vasp/">VASP at
+TACC</a></li>
+</ul>
+<p><img data-src="VASP-at-TACC.png" /></p>
+</section>
+<section id="jobs-on-the-supercomputer" class="slide level2">
 <h2>Jobs on the supercomputer</h2>
-<p>Example: <a href="https://portal.tacc.utexas.edu/software/qe">Stampede2 at TACC</a></p>
-<p>job.script</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash </span>
-<span class="co">#SBATCH -J qe                               # define the job name</span>
-<span class="co">#SBATCH -o qe.%j.out                        # define stdout &amp; stderr output files </span>
-<span class="co">#SBATCH -e qe.%j.err </span>
-<span class="co">#SBATCH -N 4                                # request 4 nodes </span>
-<span class="co">#SBATCH -n 256                              # 256 total tasks = 64 tasks/node</span>
-<span class="co">#SBATCH -p normal                           # submit to &quot;normal&quot; queue </span>
-<span class="co">#SBATCH -t 4:00:00                          # run for 4 hours max </span>
-<span class="co">#SBATCH -A projectname</span>
-
-<span class="ex">module</span> load qe/6.2.1                        # setup environment
-<span class="ex">ibrun</span> pw.x -input qeinput <span class="op">&gt;</span> qe_test.out     # launch job</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">sbatch</span> job.script</code></pre></div>
+<p>Example: Accessing TACC resources</p>
+<ul>
+<li>Will depend on which machine you are using.</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> <span class="at">-X</span> <span class="op">&lt;</span>your-username<span class="op">&gt;</span>@stampede2.tacc.utexas.edu</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> <span class="at">-X</span> <span class="op">&lt;</span>you-username<span class="op">&gt;</span>@ls6.tacc.utexas.edu</span></code></pre></div>
+</section>
+<section id="section-3" class="slide level2">
+<h2></h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">The</span> authenticity of host <span class="st">&#39;stampede2.tacc.utexas.edu (129.114.63.44)&#39;</span> can<span class="st">&#39;t be established.</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="st">ECDSA key fingerprint is SHA256:SegC2YyyftiRpdwhXqNZE+15RyGeFSal4Vuz0HYJ5E8.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="st">Are you sure you want to continue connecting (yes/no/[fingerprint])? yes</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="st">Warning: Permanently added &#39;</span>stampede2.tacc.utexas.edu,129.114.63.44<span class="st">&#39; (ECDSA) to the list of known hosts.</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="st">To access the system:</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="st">1) If not using ssh-keys, please enter your TACC password at the password prompt</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="st">2) At the TACC Token prompt, enter your 6-digit code followed by &lt;return&gt;.</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="st">Password: </span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="st">TACC Token Code:</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="st">Last login: Thu Feb 14 11:37:13 2019 from 149.165.168.51</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="st">------------------------------------------------------------------------------</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="st">                   Welcome to the Stampede2 Supercomputer</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="st">      Texas Advanced Computing Center, The University of Texas at Austin</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="st">------------------------------------------------------------------------------</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="st">              ** Unauthorized use/access is prohibited. **</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="st">If you log on to this computer system, you acknowledge your awareness</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="st">of and concurrence with the UT Austin Acceptable Use Policy. The</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="st">University will prosecute violators to the full extent of the law.</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="st">TACC Usage Policies:</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="st">http://www.tacc.utexas.edu/user-services/usage-policies/</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="st">______________________________________________________________________________</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="st">Welcome to Stampede2, *please* read these important system notes:</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="st">--&gt; Stampede2 user documentation is available at:</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="st">       https://portal.tacc.utexas.edu/user-guides/stampede2</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="st">2/24/2022:  OS was updated to latest CentOS 7.9 release along with Slurm 20,</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="st">            OPA 10.11 and Lustre 2.12 updates.  Please submit a support ticket</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="st">            if you encounter any issues after the update.</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="st">            The icx-normal queue is now available for users, up to 40 nodes</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="st">            with 80 cores per node for a single job.</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="st">--------------------- Project balances for user wwwennie ----------------------</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="st">| Name           Avail SUs     Expires |                                      |</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="st">| TG-MAT220010        1600  2023-04-06 |                                      |</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="st">------------------------ Disk quotas for user wwwennie ------------------------</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="st">| Disk         Usage (GB)     Limit    %Used   File Usage       Limit   %Used |</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="st">| /home1              2.4      10.0    24.34         3541      200000    1.77 |</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="st">| /work2              0.0    1024.0     0.00            3     3000000    0.00 |</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="st">| /scratch            0.0       0.0     0.00           66           0    0.00 |</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="st">-------------------------------------------------------------------------------</span></span></code></pre></div>
+</section>
+<section id="jobs-on-the-supercomputer-1" class="slide level2">
+<h2>Jobs on the supercomputer</h2>
+<p>Example: <a
+href="https://docs.tacc.utexas.edu/software/quantumespresso/">Stampede2
+at TACC</a></p>
+<ul>
+<li>see also <code>job.script</code></li>
+</ul>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -J qe                               # define the job name</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -o qe.%j.out                        # define stdout &amp; stderr output files </span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -e qe.%j.err </span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -N 4                                # request 4 nodes </span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -n 256                              # 256 total tasks = 64 tasks/node</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -p normal                           # submit to &quot;normal&quot; queue </span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -t 4:00:00                          # run for 4 hours max </span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -A projectname</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">module</span> load qe/6.2.1                        <span class="co"># setup environment</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="ex">ibrun</span> pw.x <span class="at">-input</span> qeinput <span class="op">&gt;</span> qe_test.out     <span class="co"># launch job</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sbatch</span> job.script</span></code></pre></div>
 </section>
 <section id="parallelization-in-dft-codes" class="slide level2">
 <h2>Parallelization in DFT codes</h2>
 <ul>
-<li>Every code has a scheme of parallelization- it is important to understand what these levels are and how well they perform</li>
-<li>The goal is to load balance so that no cores are unnecessarily idle</li>
+<li>Every code has a scheme of parallelization- it is important to
+understand what these levels are and how well they perform</li>
+<li>The goal is to load balance so that no cores are unnecessarily
+idle</li>
 </ul>
 </section>
 <section id="parallelization-in-dft-codes-1" class="slide level2">
 <h2>Parallelization in DFT codes</h2>
 <p>Example: Quantum ESPRESSO</p>
 <ul>
-<li>Parallelize 8 images across 512 processors; for each image:</li>
+<li>Parallelize 8 images across 512 processors; for each image:
+<ul>
 <li>2 pools of over k-points with 256 processors;</li>
 <li>4 task groups for the 3D FFT with 64 processors each</li>
-<li>144 processors for diagonalization of subspace Hamiltonian</li>
+<li>144 processes for diagonalization of subspace Hamiltonian<br />
+</li>
+</ul></li>
+<li>512 processors/image * 8 images = 4096 processors requested in
+total</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">mpirun</span> -np 4096 ./neb.x -ni 8 -nk 2 -nt 4 -nd 144 -i my.input</code></pre></div>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mpirun</span> <span class="at">-np</span> 4096 ./neb.x <span class="at">-ni</span> 8 <span class="at">-nk</span> 2 <span class="at">-nt</span> 4 <span class="at">-nd</span> 144 <span class="at">-i</span> my.input</span></code></pre></div>
 </section>
 <section id="what-are-scaling-tests" class="slide level2">
 <h2>What are scaling tests</h2>
 <p>Goal: find most efficient parallelization scheme</p>
 <p>How do you choose the parallelization parameters?</p>
-<p>--&gt; Documentation/forums, tutorials and small test cases, scaling tests!</p>
-<p>Scaling tests: estimating resource usage based on small tests of parallelization schemes</p>
+<p>–&gt; Documentation/forums, tutorials and small test cases, and
+scaling tests!</p>
+<p>Scaling tests: estimating resource usage; in this case, based on
+small tests of parallelization schemes</p>
+<p>TACC measures compute sources in terms of <a
+href="https://www.tacc.utexas.edu/use-tacc/allocations/">Service Units
+(SUs)</a></p>
+<p><code>SUs charged = (Number of nodes) x (job wall-clock time) x (multiplier, which depends on machine)</code></p>
 </section>
 <section id="why-we-do-scaling-tests" class="slide level2">
 <h2>Why we do scaling tests</h2>
 <ul>
-<li><p>DFT codes scale with <span class="math inline">\(O(N^3)\)</span> where <span class="math inline">\(N\)</span> is some measure of system size (e.g., number of electrons, number of bands)</p></li>
-<li><p>In general, not all parts of a DFT calculation scales linearly with processors</p></li>
-<li><p>A simulation cell of about 100 atoms could take anywhere between a few hours to a few weeks (e.g., depending on functional)</p></li>
+<li><p>DFT codes scale with <span class="math inline">\(O(N^3)\)</span>
+where <span class="math inline">\(N\)</span> is some measure of system
+size (e.g., number of electrons, number of bands, number of
+k-points)</p></li>
+<li><p>In general, not all parts of a DFT calculation scales linearly
+with processors (<a href="https://hpc-wiki.info/hpc/Scaling">general
+scaling in HPC</a>)</p></li>
+<li><p>A simulation cell of about 100 atoms could take anywhere between
+a few hours to a few weeks (e.g., depending on functional)</p></li>
 </ul>
 </section>
 <section id="why-we-do-scaling-tests-1" class="slide level2">
 <h2>Why we do scaling tests</h2>
 <ul>
-<li><p>Not enough parallelization: wait too long for calculatoin to finish</p></li>
-<li><p>Improper parallelization: waste of hours (and energy!)</p></li>
+<li><p>To find the most efficient and optimal running scheme!</p></li>
+<li><p>Not enough parallelization: wait too long for calculation to
+finish</p></li>
+<li><p>Improper parallelization: idle processors, waste of hours, waste
+of energy! (see also e.g., <a
+href="https://www.green-algorithms.org/GA4HPC/">Green Algorithms 4
+HPC</a></p></li>
 </ul>
 </section>
 <section id="how-do-we-do-scaling-tests" class="slide level2">
 <h2>How do we do scaling tests</h2>
 <ol type="1">
-<li><p>set up a working calculation that is representative of the calculations you anticipate for the project</p></li>
-<li><p>enumerate a few parallelization schemes</p></li>
-<li>run the minimum calculation needed</li>
+<li><p>set up a working calculation that is representative of the types
+of calculations you anticipate for the project within the next
+allocation period (usually 6 months to a year).</p></li>
+<li><p>enumerate a few parallelization schemes and set up your
+calculations</p></li>
+<li><p>run the minimum calculation needed</p></li>
 </ol>
 <ul>
-<li>e.g., single scf cycle, extrapolate to atomic relaxation</li>
-<li>e.g., single q-point phonon calculation, extrapolate to q-point mesh</li>
+<li>e.g., run a single or a few scf cycles, estimate number of scf
+cycles required to run ionic relaxations</li>
+<li>e.g., run single q-point phonon calculation, extrapolate to get
+total estimated time to run full q-point mesh</li>
 </ul>
 <ol start="4" type="1">
-<li>collect data, visualize, and pick a scheme</li>
+<li>collect data on timings, plot the timings, and pick a scheme that is
+close to linear scaling but does not substantially waste resources</li>
 </ol>
 </section>
 <section id="example-scaling-test" class="slide level2">
-<h2>Example: Scaling test</h2>
+<h2>Example Scaling test</h2>
 <ul>
-<li>Comparing WO<span class="math inline">\(_3\)</span> and SrTiO<span class="math inline">\(_3\)</span> electron transport properties</li>
-<li>do tests with and without spin-orbit coupling</li>
+<li>Comparing WO<span class="math inline">\(_3\)</span> and SrTiO<span
+class="math inline">\(_3\)</span> electron transport properties</li>
+<li>do tests with and without spin-orbit coupling (SOC)</li>
 <li>need to compute many phonons on a dense grid</li>
-<li>find out time to compute one phonon; repeat for all cases</li>
-<li>Paper: <a href="https://dx.doi.org/10.1103/PhysRevB.101.045116">doi:10.1103/PhysRevB.101.045116</a></li>
+<li>find out time to compute single phonon; repeat for with and without
+SOC</li>
+<li>Paper: <a
+href="https://dx.doi.org/10.1103/PhysRevB.101.045116">doi:10.1103/PhysRevB.101.045116</a></li>
 </ul>
 </section>
 <section id="example-scaling-test-1" class="slide level2">
 <h2>Example: Scaling test</h2>
 <ul>
-<li>One way to automate the scaling test (but first, try a few test cases!)</li>
+<li>A basic way to set up the calculations for running each
+parallelization scheme</li>
 </ul>
 <p>set_scaling.sh</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
-
-<span class="va">proc=(</span>144 160 320<span class="va">)</span>
-<span class="va">npool=(</span>2 4 6 8<span class="va">)</span>
-
-<span class="kw">for</span> <span class="ex">i</span> in <span class="st">&quot;</span><span class="va">${proc[@]}</span><span class="st">&quot;</span><span class="kw">;</span> <span class="kw">do</span>
-   <span class="kw">for</span> <span class="ex">j</span> in <span class="st">&quot;</span><span class="va">${npool[@]}</span><span class="st">&quot;</span><span class="kw">;</span> <span class="kw">do</span>
-       <span class="fu">mkdir</span> p<span class="va">${i}</span>n<span class="va">${j}</span><span class="kw">;</span> <span class="bu">cd</span> p<span class="va">${i}</span>n<span class="va">${j}</span>
-       <span class="co"># copy template input files</span>
-       <span class="fu">cp</span> -r ../input.in ../*UPF ../phrun.sh .
-       <span class="co"># substitute parallelization into run command </span>
-       <span class="co"># of a template job submission script called phrun.sh</span>
-       <span class="fu">sed</span> -i <span class="st">&quot;s/REPL1/</span><span class="va">${i}</span><span class="st">/g&quot;</span> phrun.sh<span class="kw">;</span> <span class="fu">sed</span> -i <span class="st">&quot;s/REPL2/</span><span class="va">${j}</span><span class="st">/g&quot;</span> phrun.sh
-       <span class="bu">cd</span> ../
-   <span class="kw">done</span>
-<span class="kw">done</span></code></pre></div>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">wwwennie@stampede2</span> scaling-test $ ls
-<span class="ex">p144n2</span>  p144n4  p144n6  p144n8  p160n2  p160n4  p160n6  p160n8  p320n2  p320n4  p320n6  p320n8  set_scaling.sh</code></pre></div>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="va">proc</span><span class="op">=</span><span class="va">(</span>144 160 320<span class="va">)</span>  <span class="co"># number of requested processors</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="va">npool</span><span class="op">=</span><span class="va">(</span>2 4 6 8<span class="va">)</span>     <span class="co"># using k-point parallelization in QE</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># loop over each possible combination of processors</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># and k-point parallelization</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># make a separate directory p&lt;processors&gt;n&lt;pools&gt;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># generate correpsonding input files and job submission script</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="st">&quot;</span><span class="va">${proc</span><span class="op">[@]</span><span class="va">}</span><span class="st">&quot;</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>   <span class="cf">for</span> j <span class="kw">in</span> <span class="st">&quot;</span><span class="va">${npool</span><span class="op">[@]</span><span class="va">}</span><span class="st">&quot;</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>       <span class="fu">mkdir</span> p<span class="va">${i}</span>n<span class="va">${j}</span><span class="kw">;</span> <span class="bu">cd</span> p<span class="va">${i}</span>n<span class="va">${j}</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>       <span class="co"># copy template input files</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>       <span class="fu">cp</span> <span class="at">-r</span> ../input.in ../<span class="pp">*</span>UPF ../phrun.sh .</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>       <span class="co"># substitute parallelization into run command </span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>       <span class="co"># of a template job submission script called phrun.sh</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>       <span class="fu">sed</span> <span class="at">-i</span> <span class="st">&quot;s/REPL1/</span><span class="va">${i}</span><span class="st">/g&quot;</span> phrun.sh<span class="kw">;</span> <span class="fu">sed</span> <span class="at">-i</span> <span class="st">&quot;s/REPL2/</span><span class="va">${j}</span><span class="st">/g&quot;</span> phrun.sh</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>       <span class="bu">cd</span> ../</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>   <span class="cf">done</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">wwwennie@stampede2</span> scaling-test $ ls</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">p144n2</span>  p144n4  p144n6  p144n8  p160n2  p160n4  p160n6  p160n8  p320n2  p320n4  p320n6  p320n8  set_scaling.sh</span></code></pre></div>
 </section>
 <section id="example-scaling-test-2" class="slide level2">
 <h2>Example: Scaling test</h2>
-<figure>
-<img src="cubic-elph.png" />
-</figure>
+<ul>
+<li>Collect the total wall-clock time for a single phonon and plot</li>
+<li>we plot scaling 1/time v number of processors</li>
+<li>In ideal scaling, doubling the number of processors would halve the
+wall-clock time</li>
+<li>In reality, at some point, running with more processors often leads
+to sub-linear scaling</li>
+<li>One potential cause for sub-linear scaling is increased overhead of
+communication between interconnects, especially for large memory
+jobs</li>
+<li>In this case, we chose to use the parallelization scheme with 28
+processors. While the scaling is sub-linear, the added speed in
+calculations was deemed worthwhile given the dense q-point grids this
+calculation would be repeated over (i.e., some computational efficiency
+was traded for human-time speed).</li>
+</ul>
+<p><img data-src="cubic-elph.png" /></p>
+</section>
+<section id="writing-up-scaling-tests-in-allocation-proposals"
+class="slide level2">
+<h2>Writing up scaling tests in allocation proposals</h2>
+<ul>
+<li>Progress Report:
+<ul>
+<li>Preliminary results, papers published with allocation</li>
+</ul></li>
+<li>Scientific Research Objective
+<ul>
+<li>What is the goal of the calculation?</li>
+<li>Describe the project</li>
+</ul></li>
+<li>Computational Methodology
+<ul>
+<li>What methods will you use?</li>
+<li>Are the proposed methods appropriate and feasible?</li>
+<li>How will HPC resources play a role in your calculations?</li>
+</ul></li>
+<li>Applications/Codes: Will the software require any special
+setup?</li>
+<li>Application efficiencies: Scaling tests</li>
+<li>Computational Research Plan
+<ul>
+<li>What types of calculations are planned for the proposed
+allocation?</li>
+</ul></li>
+<li>Justification of computer SUs and memory requirements</li>
+</ul>
+<p>Each HPC center has its own allocation cycle and policies (e.g., at
+<a
+href="https://allocations.access-ci.org/prepare-requests-overview">TACC</a>)</p>
 </section>
 <section id="writing-up-scaling-tests" class="slide level2">
 <h2>Writing up scaling tests</h2>
 <ul>
-<li>Progress Report (if relevant)</li>
-<li>Scientific Research Objective: What is the goal of the calculation?</li>
-<li>Computational Methodology, Applications/Codes</li>
-<li>Application efficiencies</li>
-<li>Computational Research Plan</li>
-<li>Justification of computer SUs and memory requirements</li>
+<li>aim to do tests on anticipated machine architecture</li>
+<li>add some buffer to the estimated hours requested; there will be
+failed jobs, testing of parameters not known at time of scaling tests,
+etc.</li>
 </ul>
-</section>
-<section id="writing-up-scaling-tests-1" class="slide level2">
-<h2>Writing up scaling tests</h2>
-<ul>
-<li>aim to do tests on anticipate machine architecture</li>
-<li>add some buffer to the hours requested- failed jobs, testing of parameters not known at time of scaling tests, etc.</li>
-</ul>
-<p><a href="https://wikis.utexas.edu/download/attachments/360416757/XSEDE2018-WW.pdf?version=1&amp;modificationDate=1653437358790&amp;api=v2">Group wiki: Example write up</a></p>
+<p><a
+href="https://utexas.box.com/s/v66fdky6slqvqc87i6mc7ydks43mp4yx">Group
+Box Example writeup</a>; must have UT EID</p>
 </section>
     </div>
   </div>
 
-  <script src="https://unpkg.com/reveal.js@3.9.2//lib/js/head.min.js"></script>
-  <script src="https://unpkg.com/reveal.js@3.9.2//js/reveal.js"></script>
+  <script src="https://unpkg.com/reveal.js@3.9.2//dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="https://unpkg.com/reveal.js@3.9.2//plugin/notes/notes.js"></script>
+  <script src="https://unpkg.com/reveal.js@3.9.2//plugin/search/search.js"></script>
+  <script src="https://unpkg.com/reveal.js@3.9.2//plugin/zoom/zoom.js"></script>
+  <script src="https://unpkg.com/reveal.js@3.9.2//plugin/math/math.js"></script>
 
   <script>
 
       // Full list of configuration options available at:
-      // https://github.com/hakimel/reveal.js#configuration
+      // https://revealjs.com/config/
       Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
 
-        // Optional reveal.js plugins
-        dependencies: [
-          { src: 'https://unpkg.com/reveal.js@3.9.2//lib/js/classList.js', condition: function() { return !document.body.classList; } },
-          { src: 'https://unpkg.com/reveal.js@3.9.2//plugin/zoom-js/zoom.js', async: true },
-              { src: 'https://unpkg.com/reveal.js@3.9.2//plugin/notes/notes.js', async: true }
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
         ]
       });
     </script>
